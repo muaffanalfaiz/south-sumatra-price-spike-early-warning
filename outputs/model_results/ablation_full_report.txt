@@ -1,0 +1,148 @@
+======================================================================
+ABLATION EXPERIMENT RESULTS
+Horticultural Price Spike Early-Warning, South Sumatra
+======================================================================
+
+______________________________________________________________________
+EXPERIMENT: Full model
+______________________________________________________________________
+Train: 1488 rows | Test: 372 rows
+Features (16): ['supply_ndvi_lag2', 'supply_ndvi_lag3', 'supply_ndvi_lag4', 'local_ndvi_lag2', 'local_ndvi_lag3', 'rain_lag1', 'rain_lag2', 'rain_4wk_sum', 'supply_ndvi_4wk_trend', 'min_distance_km', 'min_travel_hrs', 'month', 'is_wet_season', 'flood_risk_lag1', 'stress_x_distance', 'price_pct_change']
+Spike rate (test): 21.8%
+
+Logistic Regression:
+  P=0.392 R=0.901 F1=0.547 AUC=0.877
+  Confusion matrix: [[178, 113], [8, 73]]
+  Top coefficients:
+    price_pct_change               +1.7004
+    min_distance_km                -0.5268
+    rain_4wk_sum                   +0.4055
+    supply_ndvi_lag3               +0.3921
+    supply_ndvi_lag2               +0.3867
+    month                          +0.3622
+    min_travel_hrs                 +0.3479
+    is_wet_season                  +0.3354
+
+Random Forest:
+  P=0.485 R=0.802 F1=0.605 AUC=0.863
+  Confusion matrix: [[222, 69], [16, 65]]
+  Top features:
+    price_pct_change               0.4715
+    month                          0.0591
+    supply_ndvi_4wk_trend          0.0540
+    rain_lag1                      0.0533
+    rain_lag2                      0.0513
+    rain_4wk_sum                   0.0491
+    supply_ndvi_lag3               0.0451
+    supply_ndvi_lag4               0.0440
+
+______________________________________________________________________
+EXPERIMENT: Early-warning only
+______________________________________________________________________
+Train: 1488 rows | Test: 372 rows
+Features (15): ['supply_ndvi_lag2', 'supply_ndvi_lag3', 'supply_ndvi_lag4', 'local_ndvi_lag2', 'local_ndvi_lag3', 'rain_lag1', 'rain_lag2', 'rain_4wk_sum', 'supply_ndvi_4wk_trend', 'min_distance_km', 'min_travel_hrs', 'month', 'is_wet_season', 'flood_risk_lag1', 'stress_x_distance']
+Spike rate (test): 21.8%
+
+Logistic Regression:
+  P=0.322 R=0.827 F1=0.464 AUC=0.762
+  Confusion matrix: [[150, 141], [14, 67]]
+  Top coefficients:
+    month                          +0.4182
+    min_distance_km                -0.3606
+    supply_ndvi_lag2               +0.2862
+    is_wet_season                  +0.2774
+    rain_4wk_sum                   +0.2764
+    min_travel_hrs                 +0.2452
+    stress_x_distance              -0.2160
+    supply_ndvi_4wk_trend          +0.1841
+
+Random Forest:
+  P=0.414 R=0.593 F1=0.487 AUC=0.680
+  Confusion matrix: [[223, 68], [33, 48]]
+  Top features:
+    month                          0.1155
+    supply_ndvi_4wk_trend          0.0981
+    rain_4wk_sum                   0.0958
+    rain_lag2                      0.0937
+    supply_ndvi_lag4               0.0882
+    rain_lag1                      0.0847
+    supply_ndvi_lag3               0.0833
+    supply_ndvi_lag2               0.0771
+
+______________________________________________________________________
+EXPERIMENT: Cabai only
+______________________________________________________________________
+Train: 744 rows | Test: 186 rows
+Features (15): ['supply_ndvi_lag2', 'supply_ndvi_lag3', 'supply_ndvi_lag4', 'local_ndvi_lag2', 'local_ndvi_lag3', 'rain_lag1', 'rain_lag2', 'rain_4wk_sum', 'supply_ndvi_4wk_trend', 'min_distance_km', 'min_travel_hrs', 'month', 'is_wet_season', 'flood_risk_lag1', 'stress_x_distance']
+Spike rate (test): 22.0%
+
+Logistic Regression:
+  P=0.276 R=0.390 F1=0.323 AUC=0.555
+  Confusion matrix: [[103, 42], [25, 16]]
+  Top coefficients:
+    month                          +0.3411
+    is_wet_season                  +0.3052
+    rain_lag2                      -0.2864
+    supply_ndvi_4wk_trend          +0.2518
+    supply_ndvi_lag4               -0.1932
+    min_distance_km                -0.1851
+    rain_lag1                      +0.1750
+    min_travel_hrs                 +0.1415
+
+Random Forest:
+  P=0.278 R=0.122 F1=0.169 AUC=0.487
+  Confusion matrix: [[132, 13], [36, 5]]
+  Top features:
+    month                          0.1522
+    supply_ndvi_4wk_trend          0.1317
+    supply_ndvi_lag4               0.1197
+    rain_4wk_sum                   0.0992
+    supply_ndvi_lag3               0.0902
+    supply_ndvi_lag2               0.0836
+    local_ndvi_lag2                0.0664
+    rain_lag2                      0.0649
+
+______________________________________________________________________
+EXPERIMENT: Bawang only
+______________________________________________________________________
+Train: 744 rows | Test: 186 rows
+Features (15): ['supply_ndvi_lag2', 'supply_ndvi_lag3', 'supply_ndvi_lag4', 'local_ndvi_lag2', 'local_ndvi_lag3', 'rain_lag1', 'rain_lag2', 'rain_4wk_sum', 'supply_ndvi_4wk_trend', 'min_distance_km', 'min_travel_hrs', 'month', 'is_wet_season', 'flood_risk_lag1', 'stress_x_distance']
+Spike rate (test): 21.5%
+
+Logistic Regression:
+  P=0.270 R=0.825 F1=0.407 AUC=0.767
+  Confusion matrix: [[57, 89], [7, 33]]
+  Top coefficients:
+    rain_4wk_sum                   +0.7366
+    supply_ndvi_lag2               +0.6452
+    supply_ndvi_lag3               +0.5372
+    month                          +0.5085
+    min_distance_km                -0.3640
+    is_wet_season                  +0.3598
+    supply_ndvi_4wk_trend          +0.3126
+    stress_x_distance              -0.2722
+
+Random Forest:
+  P=0.482 R=0.675 F1=0.562 AUC=0.735
+  Confusion matrix: [[117, 29], [13, 27]]
+  Top features:
+    rain_4wk_sum                   0.1342
+    month                          0.1096
+    rain_lag2                      0.0958
+    rain_lag1                      0.0908
+    supply_ndvi_lag2               0.0878
+    supply_ndvi_lag3               0.0815
+    supply_ndvi_4wk_trend          0.0808
+    supply_ndvi_lag4               0.0714
+
+======================================================================
+KEY COMPARISON: Full model vs Early-warning only
+======================================================================
+AUC drop (LR):  0.877 -> 0.762 (delta: -0.115)
+AUC drop (RF):  0.863 -> 0.680 (delta: -0.183)
+F1 drop (LR):   0.547 -> 0.464 (delta: -0.083)
+F1 drop (RF):   0.605 -> 0.487 (delta: -0.117)
+
+Interpretation:
+  AUC drop 0.10-0.15: Environmental variables provide moderate standalone power.
+  Both signals are needed for best performance.

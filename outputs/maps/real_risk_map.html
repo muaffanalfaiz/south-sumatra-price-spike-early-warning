@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_195dd15ea295ef155db2a8b121f7b182 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_195dd15ea295ef155db2a8b121f7b182" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_195dd15ea295ef155db2a8b121f7b182 = L.map(
+                "map_195dd15ea295ef155db2a8b121f7b182",
+                {
+                    center: [-3.2, 103.8],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 8,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_d0d4e34fcff903b1e079618975c6221b = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_d0d4e34fcff903b1e079618975c6221b.addTo(map_195dd15ea295ef155db2a8b121f7b182);
+        
+    
+            var circle_marker_946b9c176b3bfcb171462f34d2e8150b = L.circleMarker(
+                [-3.3, 102.867],
+                {"bubblingMouseEvents": true, "color": "#fee08b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fee08b", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 25.586849816481713, "stroke": true, "weight": 3}
+            ).addTo(map_195dd15ea295ef155db2a8b121f7b182);
+        
+    
+        var popup_99014bc85579171442fbc9a18ab945a0 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_8ac8db3680d40ed398496fcf4a8ab180 = $(`<div id="html_8ac8db3680d40ed398496fcf4a8ab180" style="width: 100.0%; height: 100.0%;"><b>Kota Lubuk Linggau</b><br>Spike risk: 42%</div>`)[0];
+                popup_99014bc85579171442fbc9a18ab945a0.setContent(html_8ac8db3680d40ed398496fcf4a8ab180);
+            
+        
+
+        circle_marker_946b9c176b3bfcb171462f34d2e8150b.bindPopup(popup_99014bc85579171442fbc9a18ab945a0)
+        ;
+
+        
+    
+    
+            circle_marker_946b9c176b3bfcb171462f34d2e8150b.bindTooltip(
+                `<div>
+                     Kota Lubuk Linggau: 42%
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c8a46e137d399d6a3f1ab8083670ce55 = L.circleMarker(
+                [-2.976, 104.775],
+                {"bubblingMouseEvents": true, "color": "#fee08b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#fee08b", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 26.708036235608628, "stroke": true, "weight": 3}
+            ).addTo(map_195dd15ea295ef155db2a8b121f7b182);
+        
+    
+        var popup_70ea41f85538734c05488f9cf9c46118 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_d1d943768a04bc84bfbda8d8e1c846b1 = $(`<div id="html_d1d943768a04bc84bfbda8d8e1c846b1" style="width: 100.0%; height: 100.0%;"><b>Kota Palembang</b><br>Spike risk: 47%</div>`)[0];
+                popup_70ea41f85538734c05488f9cf9c46118.setContent(html_d1d943768a04bc84bfbda8d8e1c846b1);
+            
+        
+
+        circle_marker_c8a46e137d399d6a3f1ab8083670ce55.bindPopup(popup_70ea41f85538734c05488f9cf9c46118)
+        ;
+
+        
+    
+    
+            circle_marker_c8a46e137d399d6a3f1ab8083670ce55.bindTooltip(
+                `<div>
+                     Kota Palembang: 47%
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fc9452777c2ba2b09f68a1a5a5630c18 = L.circleMarker(
+                [-3.3, 103.8],
+                {"bubblingMouseEvents": true, "color": "#91cf60", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#91cf60", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 22.278365311409107, "stroke": true, "weight": 3}
+            ).addTo(map_195dd15ea295ef155db2a8b121f7b182);
+        
+    
+        var popup_f18877c565aa872075cfdc1e72b84481 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_782ce2c49bd56bde4ee8b3b174372f5a = $(`<div id="html_782ce2c49bd56bde4ee8b3b174372f5a" style="width: 100.0%; height: 100.0%;"><b>Sumatera Selatan</b><br>Spike risk: 29%</div>`)[0];
+                popup_f18877c565aa872075cfdc1e72b84481.setContent(html_782ce2c49bd56bde4ee8b3b174372f5a);
+            
+        
+
+        circle_marker_fc9452777c2ba2b09f68a1a5a5630c18.bindPopup(popup_f18877c565aa872075cfdc1e72b84481)
+        ;
+
+        
+    
+    
+            circle_marker_fc9452777c2ba2b09f68a1a5a5630c18.bindTooltip(
+                `<div>
+                     Sumatera Selatan: 29%
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0b9d092e11cb334d9e29337a2924b9b7 = L.circleMarker(
+                [-3.8, 103.55],
+                {"bubblingMouseEvents": true, "color": "#2E75B6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2E75B6", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_195dd15ea295ef155db2a8b121f7b182);
+        
+    
+            circle_marker_0b9d092e11cb334d9e29337a2924b9b7.bindTooltip(
+                `<div>
+                     Lahat (producing area)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9de7e4807d6fe1584c654144d3574183 = L.circleMarker(
+                [-4.017, 103.267],
+                {"bubblingMouseEvents": true, "color": "#2E75B6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2E75B6", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_195dd15ea295ef155db2a8b121f7b182);
+        
+    
+            circle_marker_9de7e4807d6fe1584c654144d3574183.bindTooltip(
+                `<div>
+                     Kota Pagaralam (producing area)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fbbd14bea4ac33b0644ab1f5071dad89 = L.circleMarker(
+                [-4.4, 104.1],
+                {"bubblingMouseEvents": true, "color": "#2E75B6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2E75B6", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_195dd15ea295ef155db2a8b121f7b182);
+        
+    
+            circle_marker_fbbd14bea4ac33b0644ab1f5071dad89.bindTooltip(
+                `<div>
+                     OKU Selatan (producing area)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5b1620d0164cf2226e0fc203e51a1bdb = L.circleMarker(
+                [-3.75, 104.5],
+                {"bubblingMouseEvents": true, "color": "#2E75B6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2E75B6", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_195dd15ea295ef155db2a8b121f7b182);
+        
+    
+            circle_marker_5b1620d0164cf2226e0fc203e51a1bdb.bindTooltip(
+                `<div>
+                     OKU Timur (producing area)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e608543d207680fa74df2a11785cc20e = L.circleMarker(
+                [-4.05, 104.05],
+                {"bubblingMouseEvents": true, "color": "#2E75B6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2E75B6", "fillOpacity": 0.5, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(map_195dd15ea295ef155db2a8b121f7b182);
+        
+    
+            circle_marker_e608543d207680fa74df2a11785cc20e.bindTooltip(
+                `<div>
+                     OKU (producing area)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+</script>
+</html>

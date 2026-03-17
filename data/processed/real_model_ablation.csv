@@ -1,0 +1,5 @@
+experiment,n_train,n_test,n_features,spike_rate_test,lr_precision,lr_recall,lr_f1,lr_auc,rf_precision,rf_recall,rf_f1,rf_auc
+Full model,1488,372,16,0.218,0.392,0.901,0.547,0.877,0.485,0.802,0.605,0.863
+Early-warning only,1488,372,15,0.218,0.322,0.827,0.464,0.762,0.414,0.593,0.487,0.68
+Cabai only,744,186,15,0.22,0.276,0.39,0.323,0.555,0.278,0.122,0.169,0.487
+Bawang only,744,186,15,0.215,0.27,0.825,0.407,0.767,0.482,0.675,0.562,0.735
