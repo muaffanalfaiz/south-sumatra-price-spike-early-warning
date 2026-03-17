@@ -172,11 +172,11 @@ Provisional title: *Predicting Horticultural Price Spikes in South Sumatra Using
 ## About
 
 Built by **Muaffan Alfaiz Wisaksono**  
-MSc Agricultural Engineering (with High Distinction), Lincoln University, New Zealand  
+MSc Precision Agriculture (with High Distinction), Lincoln University, New Zealand  
 LPDP Scholar | GIS Analyst | Precision Agriculture Researcher  
 8× Scopus-indexed publications
 
-[LinkedIn](https://www.linkedin.com/in/muaffanalfaiz) · [GitHub](https://github.com/muaffanalfaiz)
+[LinkedIn]([https://www.linkedin.com/in/muaffanalfaiz](https://www.linkedin.com/in/muaffan-alfaiz-wisaksono-499299269/)) · [GitHub](https://github.com/muaffanalfaiz)
 
 ---
 
