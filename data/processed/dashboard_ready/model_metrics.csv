@@ -1,0 +1,6 @@
+model,condition,auc,precision,recall,f1,accuracy
+Logistic Regression,Full model,0.877,0.392,0.901,0.547,0.67
+Random Forest,Full model,0.863,0.485,0.802,0.605,0.77
+Logistic Regression,Without price momentum,0.762,,,,
+Bawang satellite-only,Commodity-specific,0.767,,,,
+Cabai satellite-only,Commodity-specific,0.487,,,,

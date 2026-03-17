@@ -1,0 +1,17 @@
+feature,importance,category
+price_pct_change,0.4715115562717862,Price momentum
+month,0.0590997456415857,Seasonality
+supply_ndvi_4wk_trend,0.0539740775865928,Satellite / NDVI
+rain_lag1,0.0533216969045071,Rainfall / weather
+rain_lag2,0.051255295827802,Rainfall / weather
+rain_4wk_sum,0.0490694217826292,Rainfall / weather
+supply_ndvi_lag3,0.0450612166345989,Satellite / NDVI
+supply_ndvi_lag4,0.0440370208158552,Satellite / NDVI
+local_ndvi_lag2,0.0385768145119756,Satellite / NDVI
+stress_x_distance,0.0344766053332521,Accessibility
+supply_ndvi_lag2,0.0344119319543846,Satellite / NDVI
+local_ndvi_lag3,0.0337475361911321,Satellite / NDVI
+is_wet_season,0.0168059017147649,Rainfall / weather
+min_travel_hrs,0.0072676639638726,Accessibility
+min_distance_km,0.0065263846487721,Accessibility
+flood_risk_lag1,0.0008571302164879,Other

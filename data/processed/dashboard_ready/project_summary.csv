@@ -1,0 +1,9 @@
+metric,value
+Total observations,1860.0
+Monitored markets,3.0
+Commodities,4.0
+Weeks covered,155.0
+Spike rate (%),18.8
+Best AUC,0.877
+Spikes caught (LR),73.0
+Spikes missed (LR),8.0
