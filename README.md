@@ -1,183 +1,151 @@
-# Satellite-Informed Horticultural Price Spike Early-Warning System
-### South Sumatra, Indonesia
+# South Sumatra Horticultural Price Spike Early-Warning System
 
-> **Can satellite signals anticipate food market stress before it reaches consumers?**  
-> This project builds a working answer for South Sumatra's horticultural markets.
+A satellite-informed early-warning system for horticultural price spikes in South Sumatra, Indonesia. The pipeline integrates PIHPS weekly market prices, MODIS NDVI/EVI vegetation anomalies, CHIRPS rainfall, and OpenStreetMap road-accessibility features to predict price spikes for key commodities using machine learning.
 
-[![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square)](https://python.org)
-[![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.3-orange?style=flat-square)](https://scikit-learn.org)
-[![Google Earth Engine](https://img.shields.io/badge/Google%20Earth%20Engine-MODIS%20%7C%20CHIRPS-green?style=flat-square)](https://earthengine.google.com)
-[![Manuscript](https://img.shields.io/badge/Manuscript-In%20Preparation-lightgrey?style=flat-square)]()
-
----
-
-## The problem
-
-Horticultural price spikes in South Sumatra — driven by harvest stress in producing districts like Lahat, Pagaralam, and OKU — hit urban consumers in Palembang and Lubuk Linggau within 2–4 weeks. By the time market monitoring systems detect a spike, it has already happened.
-
-**This project asks:** can we detect the upstream conditions that precede a spike early enough to warn food-system decision-makers before prices move?
-
----
-
-## What I built
-
-A three-layer predictive pipeline that integrates:
-
-| Layer | Data | Source |
-|---|---|---|
-| Market response | Weekly horticultural prices, spike labels | PIHPS (Pusat Informasi Harga Pangan Strategis) |
-| Supply stress | District-level NDVI/EVI anomalies, 16-day composites | MODIS via Google Earth Engine |
-| Friction & weather | Weekly rainfall, road accessibility, wet season flag | CHIRPS via GEE, OpenStreetMap |
-
-**Commodities:** Cabai merah, cabai rawit, bawang merah, bawang putih  
-**Markets monitored:** Palembang, Lubuk Linggau, South Sumatra aggregate  
-**Dataset:** 1,860 observations across 155 weeks
-
-The pipeline covers data acquisition, feature engineering with lagged indicators (2–4 week lags), binary spike classification, and decision-support risk outputs.
-
----
-
-## Key findings
-
-### Full model performance (PIHPS + NDVI + Rainfall + Accessibility)
+## Key Findings
 
 | Model | AUC | Precision | Recall | F1 |
 |---|---|---|---|---|
 | Logistic Regression | **0.877** | 0.392 | 0.901 | 0.547 |
-| Random Forest | **0.863** | 0.485 | 0.802 | 0.605 |
+| Random Forest | 0.863 | **0.485** | 0.802 | **0.605** |
 
-Logistic regression catches **73 out of 81 spike events** in the test set — missing only 8.  
-Random forest produces fewer false alarms (69 vs 113), making it more suitable for operational alerting.
+**Ablation results** — removing price momentum features:
 
-### Ablation experiment — what happens without price momentum?
-
-The dominant feature in the full model is `price_pct_change` (importance: 0.472). Removing it entirely and retraining tests whether the **satellite + rainfall + seasonality** signals have genuine standalone early-warning value.
-
-| Condition | AUC |
-|---|---|
-| Full model (with price momentum) | 0.877 |
-| **Without price momentum** (satellite + weather + access only) | **0.762** |
-
-AUC drops from 0.877 to 0.762 — meaningful, but the model remains well above chance. **Environmental signals alone carry real predictive signal 2–4 weeks before price spikes are visible in market data.**
-
-### Commodity-specific finding
-
-| Commodity group | Satellite-only AUC | Interpretation |
+| Condition | LR AUC | RF AUC |
 |---|---|---|
-| Bawang merah | **0.767** | NDVI anomalies provide meaningful 2–4 week lead warning |
-| Cabai merah/rawit | 0.487 | 16-day MODIS resolution is too coarse for rapid-onset chili shocks |
+| Full model | 0.877 | 0.863 |
+| Early-warning only (no price momentum) | 0.762 | 0.680 |
+| Bawang satellite-only | 0.767 | 0.735 |
+| Cabai satellite-only | — | 0.487 |
 
-This is a genuine finding, not just a limitation. Cabai price shocks are driven by acute, fast-onset events (pest damage, sudden floods) that outpace satellite revisit frequency. Bawang merah, with its longer growing cycle and more gradual stress accumulation, is a better satellite early-warning target. **Higher temporal resolution data (Sentinel-2, 5-day revisit) may improve cabai prediction in future work.**
+**Central finding:** Satellite-derived environmental stress signals have real predictive value for horticultural price spikes, but their effectiveness varies by commodity. Signals are substantially more useful for slower-developing allium (bawang) shocks (AUC 0.767) than for fast-moving chili (cabai) shocks (AUC 0.487).
 
----
+## Study Area & Data
 
-## Repository structure
+- **Commodities:** Bawang Merah Ukuran Sedang, Bawang Putih Ukuran Sedang, Cabai Merah Besar + Keriting, Cabai Rawit Merah + Hijau
+- **Markets:** Kota Palembang, Kota Lubuk Linggau, Sumatera Selatan (province aggregate)
+- **Period:** 2023-01-16 to 2025-12-29 (155 weeks, 1,860 observations)
+- **Spike definition:** 8-week rolling z-score > 1.5
+
+## Repository Structure
 
 ```
 south-sumatra-price-spike-early-warning/
 │
-├── README.md
+├── notebooks/                          # Pipeline scripts (run in order)
+│   ├── 01_data_acquisition.py          # Scrape PIHPS daily prices via API
+│   ├── 01b_clean_pihps_data.py         # Reshape to weekly medians, flag spikes
+│   ├── 02_gee_ndvi_export.py           # MODIS NDVI/EVI anomalies + CHIRPS rainfall
+│   ├── 03_road_network.py              # OSMnx road distance / travel time features
+│   ├── 04_modeling_pipeline.py         # Synthetic data generator for pipeline testing
+│   ├── 05_run_real_pipeline.py         # Real modeling pipeline (LR + RF, temporal split)
+│   ├── 06_ablation_experiments.py      # Ablation: full, early-warning, commodity splits
+│   └── gee_scripts/                    # Google Earth Engine JavaScript exports
 │
 ├── data/
-│   ├── raw/                          # Original PIHPS, GEE exports
 │   └── processed/
-│       ├── real_prices.csv           # Cleaned weekly price series
-│       ├── real_panel_dataset.csv    # Full modeling panel with features
-│       ├── real_model_ablation.csv   # Ablation experiment results
-│       └── dashboard_ready/          # Flat tables for Power BI
-│
-├── notebooks/
-│   ├── 01_data_acquisition.ipynb     # PIHPS scraping, GEE export
-│   ├── 02_feature_engineering.ipynb  # Lag features, spike labeling
-│   ├── 03_modeling.ipynb             # LR + RF, evaluation, risk map
-│   └── 04_ablation_experiment.ipynb  # Removing price momentum, commodity split
+│       ├── real_prices.csv             # Weekly price panel
+│       ├── real_prices_daily.csv       # Daily price series
+│       ├── real_panel_dataset.csv      # Full feature matrix for modeling
+│       ├── real_model_ablation.csv     # Ablation experiment results
+│       └── dashboard_ready/            # Flat CSVs for Power BI ingestion
+│           ├── prices_dashboard.csv
+│           ├── model_metrics.csv
+│           ├── model_scores.csv
+│           ├── feature_importance.csv
+│           └── project_summary.csv
 │
 ├── outputs/
-│   ├── figures/                      # ROC curves, confusion matrices, timeseries
-│   ├── model_results/                # Evaluation text files, feature importance CSVs
-│   └── maps/                         # HTML risk map
+│   ├── figures/                        # Model performance and ablation plots
+│   │   ├── real_model_*.png
+│   │   └── ablation_*.png
+│   └── model_results/
+│       ├── real_model_evaluation.txt   # Full evaluation report
+│       ├── real_feature_importance.csv # RF feature importance rankings
+│       ├── real_lr_coefficients.csv    # LR coefficient table
+│       └── ablation_full_report.txt    # Ablation experiment results
 │
-├── powerbi/
-│   ├── south_sumatra_dashboard.pbix  # Power BI dashboard file
-│   └── screenshots/                  # Dashboard page previews
+├── powerbi/                            # Power BI Project (PBIP format)
+│   ├── south_sumatra_dashboard.pbip
+│   ├── south_sumatra_dashboard.Report/
+│   ├── south_sumatra_dashboard.SemanticModel/
+│   ├── build_pbi_layout.py            # Layout builder script
+│   └── screenshots/
+│       ├── Dashboard.png
+│       ├── Price Monitoring.png
+│       ├── Z Score and Spike Intelligence.png
+│       └── ML Model Performance.png
 │
-└── docs/
-    └── index.md                      # GitHub Pages project site
+├── export_dashboard_csvs.py           # Export model outputs → Power BI CSVs
+├── requirements.txt
+├── .gitignore
+└── README.md
 ```
 
----
+## Pipeline
 
-## How to reproduce
+### 1. Data Acquisition
+`01_data_acquisition.py` scrapes PIHPS (Pusat Informasi Harga Pangan Strategis) daily prices via the Bank Indonesia API, querying by commodity category and date chunks for South Sumatra province.
 
-```bash
-# 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/south-sumatra-price-spike-early-warning.git
-cd south-sumatra-price-spike-early-warning
+### 2. Price Cleaning & Spike Detection
+`01b_clean_pihps_data.py` reshapes the raw API output into long-format daily and weekly price tables. Prices are resampled to weekly medians and spikes are flagged using an 8-week rolling z-score with a threshold of 1.5. Note: PIHPS provides data for only two city-level markets in South Sumatra (Palembang and Lubuk Linggau) plus the provincial aggregate.
 
-# 2. Install dependencies
-pip install -r requirements.txt
+### 3. Satellite Feature Extraction
+`02_gee_ndvi_export.py` computes MODIS NDVI/EVI baseline anomalies and exports CHIRPS weekly rainfall aggregates via Google Earth Engine for the relevant agricultural districts.
 
-# 3. Run notebooks in order
-jupyter notebook notebooks/01_data_acquisition.ipynb
-```
+### 4. Road Accessibility
+`03_road_network.py` computes producer-to-consumer road distances and travel times using OSMnx, with a fallback to Euclidean distances (1.4× sinuosity factor, 35 km/h average speed) when the road network is unavailable.
 
-**Dependencies:** `pandas`, `numpy`, `scikit-learn`, `geopandas`, `matplotlib`, `seaborn`, `requests`, `jupyter`
+### 5. Modeling
+`05_run_real_pipeline.py` merges all features into a weekly panel dataset, engineers lagged NDVI/rainfall features, wet-season and flood-risk flags, and a `stress_x_distance` interaction term. Logistic Regression and Random Forest classifiers are trained on a temporal train/test split.
 
-GEE exports require a registered Google Earth Engine account. Raw PIHPS data is scraped from the public API (no authentication required).
+### 6. Ablation Experiments
+`06_ablation_experiments.py` tests the model under four conditions: full feature set, early-warning only (no price momentum), cabai-only, and bawang-only. This isolates the contribution of satellite features versus market-derived signals.
 
----
+### 7. Dashboard Export
+`export_dashboard_csvs.py` exports flat CSV tables for Power BI ingestion. Note: some headline metrics (e.g., model AUC values in `project_summary.csv`) are hard-coded in this script rather than dynamically recomputed from model objects.
 
 ## Dashboard
 
-An interactive Power BI dashboard covers four views:
+The Power BI dashboard has four pages with 22 DAX measures:
 
-- **Executive overview** — current spike risk by market, model KPIs
-- **Price monitoring** — weekly price trends by commodity and location
-- **Model drivers** — feature importance by signal type (market / NDVI / rainfall / access)
-- **Model performance** — ROC curves, confusion matrices, ablation comparison
+| Page | Content |
+|---|---|
+| **Executive Summary** | 10 KPI cards, spike alert status, price trend line chart, spike rate by commodity |
+| **Price Monitoring** | District price comparison, commodity summary table, price trend over time |
+| **Z-Score Detection** | Z-score time series, monthly spike counts, spike intelligence by commodity |
+| **Model Performance** | AUC/F1/Precision/Recall KPIs, feature importance chart, model comparison table |
 
-*Dashboard screenshots in `powerbi/screenshots/`. Full `.pbix` file included.*
+The dashboard is stored in Power BI Project (PBIP) format for version control. The semantic model definition (`.SemanticModel/`) and report layout (`.Report/`) are text-based JSON/TMDL files tracked by git. Binary `.pbix` files are excluded via `.gitignore`.
 
----
+![Executive Summary](powerbi/screenshots/Dashboard.png)
+![Price Monitoring](powerbi/screenshots/Price%20Monitoring.png)
+![Z-Score Detection](powerbi/screenshots/Z%20Score%20and%20Spike%20Intelligence.png)
+![Model Performance](powerbi/screenshots/ML%20Model%20Performance.png)
 
-## Data sources
+## Data Sources
 
-| Source | Coverage | Access |
+| Source | Description | Access |
 |---|---|---|
-| [PIHPS](https://hargapangan.id) | Weekly horticultural prices, South Sumatra | Public web API |
-| [MODIS MOD13Q1](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD13Q1) | 16-day NDVI/EVI, 250m | Google Earth Engine (free account) |
-| [CHIRPS](https://developers.google.com/earth-engine/datasets/catalog/UCSB-CHG_CHIRPS_DAILY) | Daily rainfall | Google Earth Engine (free account) |
-| [OpenStreetMap](https://www.openstreetmap.org) | Road network, accessibility | Open |
-| BPS South Sumatra | District boundaries, administrative lookup | Public |
+| [PIHPS](https://hfrfrr.bi.go.id/PIHPS/Web) | Bank Indonesia strategic food price information | Public API |
+| [MODIS MOD13Q1](https://developers.google.com/earth-engine/datasets/catalog/MODIS_061_MOD13Q1) | 250m 16-day NDVI/EVI composites | Google Earth Engine |
+| [CHIRPS](https://developers.google.com/earth-engine/datasets/catalog/UCSB-CHG_data_CHIRPS_2_0_daily) | 0.05° daily rainfall estimates | Google Earth Engine |
+| [OpenStreetMap](https://www.openstreetmap.org/) | Road network for accessibility analysis | OSMnx / Overpass API |
 
----
+## Requirements
 
-## Limitations
+```
+pip install -r requirements.txt
+```
 
-- Market coverage is limited to three monitored locations — results should not be generalised to all South Sumatra districts
-- NDVI is a vegetation stress proxy, not a confirmed harvest measure
-- Cabai early-warning from 16-day MODIS composites is insufficient — higher-resolution imagery is needed
-- The model is predictive and mechanism-informed, not a clean causal identification
+Key dependencies: pandas, scikit-learn, geopandas, osmnx, matplotlib, seaborn, requests
 
----
+## Author
 
-## Publication status
+**Muaffan Alfaiz Wisaksono**
+MSc Precision Agriculture, Lincoln University, New Zealand
+LPDP Scholar | [GitHub](https://github.com/muaffanalfaiz) | [Portfolio](https://muaffanalfaiz.github.io)
 
-Manuscript in preparation.  
-Target journal: *Computers and Electronics in Agriculture* (Scopus Q2, subscription route)  
-Provisional title: *Predicting Horticultural Price Spikes in South Sumatra Using Market Prices, Satellite-Derived Vegetation Stress, Rainfall, and Machine Learning*
+## License
 
----
-
-## About
-
-Built by **Muaffan Alfaiz Wisaksono**  
-MSc Precision Agriculture (with High Distinction), Lincoln University, New Zealand  
-LPDP Scholar | GIS Analyst | Precision Agriculture Researcher  
-8× Scopus-indexed publications
-
-[LinkedIn]([https://www.linkedin.com/in/muaffanalfaiz](https://www.linkedin.com/in/muaffan-alfaiz-wisaksono-499299269/)) · [GitHub](https://github.com/muaffanalfaiz)
-
----
-
-*This project is part of a portfolio demonstrating applied geospatial data science for agricultural and food-system intelligence.*
+This project is part of ongoing research. Please cite appropriately if using this work.
