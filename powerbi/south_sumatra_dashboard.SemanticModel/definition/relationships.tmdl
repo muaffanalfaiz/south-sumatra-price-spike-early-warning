@@ -1,0 +1,19 @@
+relationship 9cf4d189-fbd6-4091-841a-3ca2ab8412a8
+	joinOnDateBehavior: datePartOnly
+	fromColumn: prices_dashboard.date
+	toColumn: LocalDateTable_5478c982-b42f-444d-b17b-7948f1e6d9c1.Date
+
+relationship 375bcbbb-fbbf-4432-8753-287e57407244
+	joinOnDateBehavior: datePartOnly
+	fromColumn: model_scores.date
+	toColumn: LocalDateTable_359dec7c-2d40-4741-9399-c82e3ec37528.Date
+
+relationship Calendar_to_prices_dashboard
+	fromColumn: prices_dashboard.date
+	toColumn: Calendar.Date
+
+relationship Calendar_to_model_scores
+	isActive: false
+	fromColumn: model_scores.date
+	toColumn: Calendar.Date
+

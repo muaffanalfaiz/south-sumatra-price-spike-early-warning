@@ -1,0 +1,34 @@
+/// EN: Key-value store of headline project KPIs used in executive summary KPI cards. Each row is one summary statistic (metric name + numeric value). ID: Penyimpanan kunci-nilai dari KPI proyek utama yang digunakan dalam kartu KPI ringkasan eksekutif. Setiap baris adalah satu statistik ringkasan (nama metrik + nilai numerik).
+table project_summary
+	lineageTag: ef21801e-8434-4364-b55f-163d535fea80
+
+	column metric
+		dataType: string
+		lineageTag: ed545001-bdc1-4e71-b11f-82e0679ff6df
+		summarizeBy: none
+		sourceColumn: metric
+
+		annotation SummarizationSetBy = Automatic
+
+	column value
+		dataType: double
+		lineageTag: f0fdb67b-2854-4bbf-a159-2f63878b549c
+		summarizeBy: sum
+		sourceColumn: value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition project_summary = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\asus\OneDrive - Lincoln University\Life\Research\Price Spike Project\south-sumatra-price-spike-early-warning\data\processed\dashboard_ready\project_summary.csv"),[Delimiter=",", Columns=2, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"metric", type text}, {"value", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

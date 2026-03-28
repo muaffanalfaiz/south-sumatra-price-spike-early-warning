@@ -1,0 +1,26 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["prices_dashboard","feature_importance","model_metrics","project_summary","model_scores"]
+
+annotation PBI_ProTooling = ["DevMode","MCP-PBIModeling"]
+
+ref table prices_dashboard
+ref table DateTableTemplate_1c4ec765-2d9c-4e4b-8870-66709c97faae
+ref table LocalDateTable_5478c982-b42f-444d-b17b-7948f1e6d9c1
+ref table feature_importance
+ref table model_metrics
+ref table project_summary
+ref table model_scores
+ref table LocalDateTable_359dec7c-2d40-4741-9399-c82e3ec37528
+ref table Calendar
+
+ref cultureInfo en-US
+

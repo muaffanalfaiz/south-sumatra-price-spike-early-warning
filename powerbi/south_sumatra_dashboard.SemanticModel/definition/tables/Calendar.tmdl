@@ -1,0 +1,133 @@
+/// EN: Official date dimension table. Marked as Date Table. Covers the full date range of the dataset with Indonesian seasonal classification (Musim Hujan/Musim Kemarau), week numbers, and the Year-Quarter-Month-Week-Date hierarchy. ID: Tabel dimensi tanggal resmi. Ditandai sebagai Tabel Tanggal. Mencakup rentang tanggal penuh dataset dengan klasifikasi musim Indonesia (Musim Hujan/Musim Kemarau), nomor minggu, dan hierarki Tahun-Kuartal-Bulan-Minggu-Tanggal.
+table Calendar
+	lineageTag: 5423472a-9e1f-45ef-81e7-b99fb3fb1203
+	dataCategory: Time
+
+	column Date
+		isUnique
+		lineageTag: a989f182-6172-400b-83b4-966e5ca68233
+		isNameInferred
+		sourceColumn: [Date]
+
+	column Year
+		lineageTag: ca634c23-63f9-494b-8e83-4a8d025735c4
+		isNameInferred
+		sourceColumn: [Year]
+
+	column Quarter
+		lineageTag: 7a0846b2-563b-4e57-b911-0423a654c3fe
+		isNameInferred
+		sourceColumn: [Quarter]
+
+	column 'Month Number'
+		lineageTag: 6482db22-12a5-47b3-80d3-8225c2b0b800
+		isNameInferred
+		sourceColumn: [Month Number]
+
+	column 'Month Name'
+		lineageTag: 5aded4d5-d7ec-431c-8c6d-5d9eabc544d2
+		isNameInferred
+		sourceColumn: [Month Name]
+
+	column 'Month Short'
+		lineageTag: f508227b-99a6-496a-8de5-cda4b618398d
+		isNameInferred
+		sourceColumn: [Month Short]
+
+	column 'Week Number'
+		lineageTag: 202577a2-1a96-4d35-938b-dfea4f793f5f
+		isNameInferred
+		sourceColumn: [Week Number]
+
+	column 'Week Start Date'
+		lineageTag: 6de6f342-eb59-4de9-a885-a66cbb0e1688
+		isNameInferred
+		sourceColumn: [Week Start Date]
+
+	column Season
+		lineageTag: 051d541e-27e4-43be-944c-466cd10cb428
+		isNameInferred
+		sourceColumn: [Season]
+
+	column 'Day of Week Number'
+		lineageTag: 0fd5d76d-4486-49bb-8161-6796775dd0d5
+		isNameInferred
+		sourceColumn: [Day of Week Number]
+
+	column 'Day of Week'
+		lineageTag: 2e03c372-6050-4ad3-b422-102d8b90205d
+		isNameInferred
+		sourceColumn: [Day of Week]
+
+	column 'Day Short'
+		lineageTag: 381b0e77-1845-4fec-b6a4-54b4fffc7c24
+		isNameInferred
+		sourceColumn: [Day Short]
+
+	column 'Is Weekend'
+		lineageTag: e7d93736-9948-429a-af81-753ad5af5684
+		isNameInferred
+		sourceColumn: [Is Weekend]
+
+	column Year-Month
+		lineageTag: 39b39afb-44da-4494-b218-3743cea5125b
+		isNameInferred
+		sourceColumn: [Year-Month]
+
+	column Year-Quarter
+		lineageTag: 3e9dd1b0-b605-4d13-9ab1-68053a459087
+		isNameInferred
+		sourceColumn: [Year-Quarter]
+
+	/// EN: Standard time navigation hierarchy for drilling down from Year to individual Date. ID: Hierarki navigasi waktu standar untuk menelusuri dari Tahun hingga Tanggal.
+	hierarchy 'Date Hierarchy'
+		lineageTag: 58b18803-e2e9-48e5-9a94-3de09e9b32ee
+
+		level Year
+			lineageTag: c8ba0eb3-acfa-45ec-bddc-e16f36a5cf10
+			column: Year
+
+		level Quarter
+			lineageTag: 2081f43d-0123-47b6-9fac-ac9c0860543e
+			column: Quarter
+
+		level Month
+			lineageTag: 8a7f65ec-b121-4a82-83ec-b98966f2571d
+			column: 'Month Name'
+
+		level Week
+			lineageTag: d77f60fd-0418-4a79-8847-8ccf273cb74f
+			column: 'Week Number'
+
+		level Date
+			lineageTag: 1d9e7ae7-d956-4a57-ba25-68096ec63b5f
+			column: Date
+
+	partition Calendar = calculated
+		mode: import
+		source =
+				VAR _MinDate = MIN(prices_dashboard[date])
+				VAR _MaxDate = MAX(prices_dashboard[date])
+				RETURN
+				    ADDCOLUMNS(
+				        CALENDAR(_MinDate, _MaxDate),
+				        "Year",              YEAR([Date]),
+				        "Quarter",           "Q" & QUARTER([Date]),
+				        "Month Number",      MONTH([Date]),
+				        "Month Name",        FORMAT([Date], "MMMM"),
+				        "Month Short",       FORMAT([Date], "MMM"),
+				        "Week Number",       WEEKNUM([Date], 2),
+				        "Week Start Date",   [Date] - WEEKDAY([Date], 2) + 1,
+				        "Season",            IF(
+				                                MONTH([Date]) >= 11 || MONTH([Date]) <= 4,
+				                                "Musim Hujan",
+				                                "Musim Kemarau"
+				                             ),
+				        "Day of Week Number", WEEKDAY([Date], 2),
+				        "Day of Week",       FORMAT([Date], "DDDD"),
+				        "Day Short",         FORMAT([Date], "DDD"),
+				        "Is Weekend",        IF(WEEKDAY([Date], 2) >= 6, TRUE(), FALSE()),
+				        "Year-Month",        FORMAT([Date], "YYYY-MM"),
+				        "Year-Quarter",      YEAR([Date]) & "-Q" & QUARTER([Date])
+				    )
+

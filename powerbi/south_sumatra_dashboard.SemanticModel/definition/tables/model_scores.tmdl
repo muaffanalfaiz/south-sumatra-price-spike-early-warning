@@ -1,0 +1,63 @@
+/// EN: ML model output table containing anomaly scores (z-scores) and spike classification labels per commodity per date. Aggregated at province level — no district breakdown. ID: Tabel output model ML yang berisi skor anomali (z-score) dan label klasifikasi spike per komoditas per tanggal. Diagregasi di tingkat provinsi — tanpa rincian kabupaten.
+table model_scores
+	lineageTag: 65f3a532-7f52-486e-8541-1c19aa89aa22
+
+	/// EN: Date for which the ML model computed the anomaly score. ID: Tanggal di mana model ML menghitung skor anomali.
+	column date
+		dataType: dateTime
+		formatString: DD MMM YYYY
+		lineageTag: 5e537083-14f5-4382-b285-1ea05b80d83d
+		summarizeBy: none
+		sourceColumn: date
+
+		variation Variation
+			isDefault
+			relationship: 375bcbbb-fbbf-4432-8753-287e57407244
+			defaultHierarchy: LocalDateTable_359dec7c-2d40-4741-9399-c82e3ec37528.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// EN: Commodity name scored by the ML model. ID: Nama komoditas yang dinilai oleh model ML.
+	column commodity
+		dataType: string
+		lineageTag: d55a3b99-c958-4d7a-a6b2-376a94cdca47
+		summarizeBy: none
+		sourceColumn: commodity
+
+		annotation SummarizationSetBy = Automatic
+
+	/// EN: Standardised anomaly score (z-score) indicating how many standard deviations the price deviates from the rolling mean. Values above 2.0 are considered high-risk. ID: Skor anomali terstandarisasi (z-score) yang menunjukkan berapa standar deviasi harga menyimpang dari rata-rata bergulir. Nilai di atas 2,0 dianggap berisiko tinggi.
+	column z_score
+		dataType: double
+		formatString: 0.00
+		lineageTag: 872466dc-fce7-4c29-b424-a3c55bdc68ed
+		summarizeBy: average
+		sourceColumn: z_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column spike
+		dataType: int64
+		formatString: 0
+		lineageTag: eef4d822-0960-433f-8236-cd56f67e22c6
+		summarizeBy: sum
+		sourceColumn: spike
+
+		annotation SummarizationSetBy = Automatic
+
+	partition model_scores = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\asus\OneDrive - Lincoln University\Life\Research\Price Spike Project\south-sumatra-price-spike-early-warning\data\processed\dashboard_ready\model_scores.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"date", type date}, {"commodity", type text}, {"z_score", type number}, {"spike", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

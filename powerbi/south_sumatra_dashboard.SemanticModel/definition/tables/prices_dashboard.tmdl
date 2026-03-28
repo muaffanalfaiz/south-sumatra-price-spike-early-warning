@@ -1,0 +1,338 @@
+/// EN: Primary fact table containing daily horticultural commodity price observations per district (kabupaten) across South Sumatra. Each row represents one commodity-district-date price record with a binary spike flag. ID: Tabel fakta utama yang berisi observasi harga komoditas hortikultura harian per kabupaten di Sumatera Selatan. Setiap baris mewakili satu catatan harga komoditas-kabupaten-tanggal dengan tanda spike biner.
+table prices_dashboard
+	lineageTag: f752c447-b361-4798-b565-84f4f1a6e073
+
+	/// EN: Average commodity price (Rp/kg) in the current filter context. ID: Rata-rata harga komoditas (Rp/kg) dalam konteks filter saat ini.
+	measure 'Current Avg Price' = AVERAGE(prices_dashboard[price_rp_kg])
+		formatString: Rp #,##0
+		displayFolder: Price Intelligence
+		lineageTag: f64a59bd-c92b-450d-bbff-a6b4737ea11a
+
+	/// EN: Rolling 52-week (364-day) average price anchored to the last visible date. Used as the baseline for deviation and alert calculations. ID: Rata-rata harga bergulir 52 minggu (364 hari) yang dijangkar ke tanggal terakhir yang terlihat. Digunakan sebagai dasar perhitungan deviasi dan peringatan.
+	measure 'Historical Mean Price' =
+			CALCULATE(
+			    AVERAGE(prices_dashboard[price_rp_kg]),
+			    DATESINPERIOD(
+			        'Calendar'[Date],
+			        LASTDATE('Calendar'[Date]),
+			        -364,
+			        DAY
+			    )
+			)
+		formatString: Rp #,##0
+		displayFolder: Price Intelligence
+		lineageTag: c0fe67ff-a197-4339-acf6-13d0161bcd77
+
+	/// EN: Percentage deviation of current average price from the 52-week historical mean. Positive values indicate prices above the historical norm. ID: Persentase penyimpangan harga rata-rata saat ini dari rata-rata historis 52 minggu. Nilai positif menunjukkan harga di atas norma historis.
+	measure 'Price Deviation %' =
+			VAR _current = [Current Avg Price]
+			VAR _hist    = [Historical Mean Price]
+			RETURN
+			    IF(
+			        NOT ISBLANK(_hist) && _hist <> 0,
+			        DIVIDE(_current - _hist, _hist) * 100
+			    )
+		formatString: 0.00"% "
+		displayFolder: Price Intelligence
+		lineageTag: 316dced5-1d80-4cb2-9f67-09df59bd8089
+
+	/// EN: Early-warning traffic light status based on price deviation from 52-week mean. 🔴 SPIKE = >30% deviation, 🟡 WATCH = >15%, 🟢 NORMAL = within 15%. ID: Status lampu peringatan dini berdasarkan deviasi harga dari rata-rata 52 minggu. 🔴 SPIKE = deviasi >30%, 🟡 WATCH = >15%, 🟢 NORMAL = dalam 15%.
+	measure 'Spike Alert Status' =
+			VAR _dev = [Price Deviation %]
+			RETURN
+			    IF(
+			        ISBLANK(_dev),
+			        BLANK(),
+			        IF(_dev > 30, "\U0001F534 SPIKE",
+			        IF(_dev > 15, "\U0001F7E1 WATCH",
+			                      "\U0001F7E2 NORMAL"))
+			    )
+		displayFolder: Price Intelligence
+		lineageTag: 5a339cf5-67d3-4404-8b77-db0b2981bc04
+
+	/// EN: Percentage change in average price compared to the equivalent 7-day prior period. Positive = price increase week-on-week. ID: Persentase perubahan harga rata-rata dibandingkan periode 7 hari sebelumnya. Positif = kenaikan harga minggu ke minggu.
+	measure 'Week-over-Week Change %' =
+			VAR _current = [Current Avg Price]
+			VAR _prevWeek =
+			    CALCULATE(
+			        AVERAGE(prices_dashboard[price_rp_kg]),
+			        DATEADD('Calendar'[Date], -7, DAY)
+			    )
+			RETURN
+			    IF(
+			        NOT ISBLANK(_prevWeek) && _prevWeek <> 0,
+			        DIVIDE(_current - _prevWeek, _prevWeek) * 100
+			    )
+		formatString: 0.00"% "
+		displayFolder: Price Intelligence
+		lineageTag: 18cab5b6-989e-4621-9ae0-e11083ba2725
+
+	/// EN: Percentage change in average price compared to the same period one calendar month prior. ID: Persentase perubahan harga rata-rata dibandingkan periode yang sama satu bulan kalender sebelumnya.
+	measure 'Month-over-Month Change %' =
+			VAR _current    = [Current Avg Price]
+			VAR _prevMonth =
+			    CALCULATE(
+			        AVERAGE(prices_dashboard[price_rp_kg]),
+			        DATEADD('Calendar'[Date], -1, MONTH)
+			    )
+			RETURN
+			    IF(
+			        NOT ISBLANK(_prevMonth) && _prevMonth <> 0,
+			        DIVIDE(_current - _prevMonth, _prevMonth) * 100
+			    )
+		formatString: 0.00"% "
+		displayFolder: Price Intelligence
+		lineageTag: 9c097c90-3114-4507-90e5-f57ffad22e25
+
+	/// EN: Population standard deviation of daily prices over the trailing 12 weeks (84 days). Higher values indicate more erratic price behaviour. ID: Standar deviasi populasi harga harian selama 12 minggu terakhir (84 hari). Nilai lebih tinggi menunjukkan perilaku harga yang lebih tidak stabil.
+	measure 'Volatility Index' =
+			CALCULATE(
+			    STDEV.P(prices_dashboard[price_rp_kg]),
+			    DATESINPERIOD(
+			        'Calendar'[Date],
+			        LASTDATE('Calendar'[Date]),
+			        -84,
+			        DAY
+			    )
+			)
+		formatString: Rp #,##0
+		displayFolder: Price Intelligence
+		lineageTag: 5a216886-8696-4ff8-8cdc-68d8fd17a658
+
+	/// EN: Percentage of observations flagged as price spikes (spike = 1) out of all observations in the current filter context. ID: Persentase observasi yang ditandai sebagai lonjakan harga (spike = 1) dari seluruh observasi dalam konteks filter saat ini.
+	measure 'Spike Frequency %' =
+			VAR _spikeCount = CALCULATE(
+			    COUNTROWS(prices_dashboard),
+			    prices_dashboard[spike] = 1
+			)
+			VAR _totalCount = COUNTROWS(prices_dashboard)
+			RETURN
+			    IF(
+			        _totalCount > 0,
+			        DIVIDE(_spikeCount, _totalCount) * 100
+			    )
+		formatString: 0.00
+		displayFolder: Price Intelligence
+		lineageTag: e4e9411c-4fac-4aca-8d72-7eba17ebfa5f
+
+	/// EN: Maximum z-score from the ML model scoring output (model_scores table) in the current filter context. Indicates the most extreme price anomaly detected. ID: Z-score maksimum dari output model ML (tabel model_scores) dalam konteks filter saat ini. Menunjukkan anomali harga paling ekstrem yang terdeteksi.
+	measure 'Max Z-Score' =
+			CALCULATE(
+			    MAX(model_scores[z_score]),
+			    USERELATIONSHIP(model_scores[date], 'Calendar'[Date])
+			)
+		formatString: 0.00
+		displayFolder: Price Intelligence
+		lineageTag: df0d1058-785c-4ad0-9aa0-b0d12394062b
+
+	/// EN: Average z-score from the ML model scoring output across all commodities and dates in the current filter context. Values above 1.5 indicate elevated market stress. ID: Rata-rata z-score dari output model ML untuk semua komoditas dan tanggal dalam konteks filter saat ini. Nilai di atas 1,5 menunjukkan tekanan pasar yang meningkat.
+	measure 'Avg Z-Score' =
+			CALCULATE(
+			    AVERAGE(model_scores[z_score]),
+			    USERELATIONSHIP(model_scores[date], 'Calendar'[Date])
+			)
+		formatString: 0.00
+		displayFolder: Price Intelligence
+		lineageTag: 40cd23d4-2a70-493f-add2-f75980c79594
+
+	/// EN: Average price (Rp/kg) calculated per commodity in the current filter context. Use in matrix or bar chart with commodity on axis. ID: Harga rata-rata (Rp/kg) dihitung per komoditas dalam konteks filter saat ini. Gunakan dalam matriks atau grafik batang dengan komoditas pada sumbu.
+	measure 'Price by Commodity' = CALCULATE([Current Avg Price])
+		formatString: Rp #,##0
+		displayFolder: Commodity Analysis
+		lineageTag: d28d9aee-b31f-48d7-b89e-eacae7768996
+
+	/// EN: Total number of observations where the spike flag equals 1 (price spike confirmed) in the current filter context. ID: Jumlah total observasi di mana tanda spike sama dengan 1 (lonjakan harga terkonfirmasi) dalam konteks filter saat ini.
+	measure 'Total Spike Count' =
+			CALCULATE(
+			    COUNTROWS(prices_dashboard),
+			    prices_dashboard[spike] = 1
+			)
+		formatString: #,##0
+		displayFolder: Commodity Analysis
+		lineageTag: 37f183cc-807d-4af3-bfda-aaa459463d37
+
+	/// EN: Returns the name of the commodity with the highest Volatility Index (12-week price standard deviation) across all commodities visible in the current filter context. ID: Mengembalikan nama komoditas dengan Indeks Volatilitas tertinggi (standar deviasi harga 12 minggu) dari semua komoditas yang terlihat dalam konteks filter saat ini.
+	measure 'Most Volatile Commodity' =
+			VAR _volTable =
+			    ADDCOLUMNS(
+			        VALUES(prices_dashboard[commodity]),
+			        "_vol",
+			        CALCULATE(
+			            STDEV.P(prices_dashboard[price_rp_kg]),
+			            DATESINPERIOD(
+			                'Calendar'[Date],
+			                LASTDATE('Calendar'[Date]),
+			                -84, DAY
+			            )
+			        )
+			    )
+			VAR _maxVol = MAXX(_volTable, [_vol])
+			RETURN
+			    MAXX(
+			        FILTER(_volTable, [_vol] = _maxVol),
+			        prices_dashboard[commodity]
+			    )
+		displayFolder: Commodity Analysis
+		lineageTag: e8070116-0c46-4a2c-855d-97d83caf50d9
+
+	/// EN: Percentage of price observations flagged as spikes for each commodity. Computed as spike count divided by total observations, expressed as a percentage. ID: Persentase observasi harga yang ditandai sebagai lonjakan untuk setiap komoditas. Dihitung sebagai jumlah spike dibagi total observasi, dinyatakan dalam persentase.
+	measure 'Spike Rate by Commodity' =
+			VAR _spikes = CALCULATE(
+			    COUNTROWS(prices_dashboard),
+			    prices_dashboard[spike] = 1
+			)
+			VAR _total = COUNTROWS(prices_dashboard)
+			RETURN
+			    IF(
+			        _total > 0,
+			        DIVIDE(_spikes, _total) * 100
+			    )
+		formatString: 0.00
+		displayFolder: Commodity Analysis
+		lineageTag: a0a18e7b-c37c-414e-9cfb-e5a0d8a60daf
+
+	/// EN: All-time maximum z-score from model_scores for the commodity(ies) in the current filter context. Indicates the worst historical price anomaly on record. ID: Z-score maksimum sepanjang waktu dari model_scores untuk komoditas dalam konteks filter saat ini. Menunjukkan anomali harga historis terburuk yang tercatat.
+	measure 'Highest Z-Score Ever' =
+			CALCULATE(
+			    MAX(model_scores[z_score]),
+			    ALL('Calendar')
+			)
+		formatString: 0.00
+		displayFolder: Commodity Analysis
+		lineageTag: 345a5935-bfe7-41ee-88cf-3c42d6e802a3
+
+	/// EN: Average price (Rp/kg) calculated per district (kabupaten) in the current filter context. Use in map visual or bar chart with district on axis. ID: Harga rata-rata (Rp/kg) dihitung per kabupaten dalam konteks filter saat ini. Gunakan dalam visual peta atau grafik batang dengan kabupaten pada sumbu.
+	measure 'Price by District' = CALCULATE([Current Avg Price])
+		formatString: Rp #,##0
+		displayFolder: District Analysis
+		lineageTag: 9ee4e5d7-5f14-4d88-a05b-afa2b4de560f
+
+	/// EN: Count of confirmed price spike events (spike = 1) per district. Used to identify which kabupaten experiences the highest frequency of market disruptions. ID: Jumlah kejadian lonjakan harga terkonfirmasi (spike = 1) per kabupaten. Digunakan untuk mengidentifikasi kabupaten mana yang paling sering mengalami gangguan pasar.
+	measure 'District Spike Count' =
+			CALCULATE(
+			    COUNTROWS(prices_dashboard),
+			    prices_dashboard[spike] = 1
+			)
+		formatString: #,##0
+		displayFolder: District Analysis
+		lineageTag: e67d9306-4104-4ff0-87f0-8c5c786fa52b
+
+	/// EN: Difference between the maximum and minimum price observed across all districts for the selected commodity and date range. Indicates price disparity across the region. ID: Selisih antara harga maksimum dan minimum yang diamati di semua kabupaten untuk komoditas dan rentang tanggal yang dipilih. Menunjukkan disparitas harga antar wilayah.
+	measure 'Price Spread' =
+			VAR _max = MAXX(
+			    ALL(prices_dashboard[district]),
+			    CALCULATE(AVERAGE(prices_dashboard[price_rp_kg]))
+			)
+			VAR _min = MINX(
+			    ALL(prices_dashboard[district]),
+			    CALCULATE(AVERAGE(prices_dashboard[price_rp_kg]))
+			)
+			RETURN
+			    IF(
+			        NOT ISBLANK(_max) && NOT ISBLANK(_min),
+			        _max - _min
+			    )
+		formatString: Rp #,##0
+		displayFolder: District Analysis
+		lineageTag: 34c7f6fd-7a98-41a1-a979-1fdaf4bd62fc
+
+	/// EN: Name of the district (kabupaten) with the highest average price for the selected commodity and date range. ID: Nama kabupaten dengan harga rata-rata tertinggi untuk komoditas dan rentang tanggal yang dipilih.
+	measure 'Highest Price District' =
+			VAR _ranked =
+			    TOPN(
+			        1,
+			        SUMMARIZE(
+			            prices_dashboard,
+			            prices_dashboard[district],
+			            "_avgPrice", AVERAGE(prices_dashboard[price_rp_kg])
+			        ),
+			        [_avgPrice], DESC
+			    )
+			RETURN
+			    MAXX(_ranked, prices_dashboard[district])
+		displayFolder: District Analysis
+		lineageTag: e48e87ae-9a76-456a-bddb-19e03983d469
+
+	/// EN: Name of the district (kabupaten) with the lowest average price for the selected commodity and date range. Useful for identifying supply surplus areas. ID: Nama kabupaten dengan harga rata-rata terendah untuk komoditas dan rentang tanggal yang dipilih. Berguna untuk mengidentifikasi daerah surplus pasokan.
+	measure 'Lowest Price District' =
+			VAR _ranked =
+			    TOPN(
+			        1,
+			        SUMMARIZE(
+			            prices_dashboard,
+			            prices_dashboard[district],
+			            "_avgPrice", AVERAGE(prices_dashboard[price_rp_kg])
+			        ),
+			        [_avgPrice], ASC
+			    )
+			RETURN
+			    MAXX(_ranked, prices_dashboard[district])
+		displayFolder: District Analysis
+		lineageTag: c5ad71de-a337-49ba-84bc-5464acb0260f
+
+	/// EN: Date of the price observation. ID: Tanggal observasi harga.
+	column date
+		dataType: dateTime
+		formatString: DD MMM YYYY
+		lineageTag: 6300b53a-6e45-4488-8a06-5b8ac832c864
+		summarizeBy: none
+		sourceColumn: date
+
+		variation Variation
+			isDefault
+			relationship: 9cf4d189-fbd6-4091-841a-3ca2ab8412a8
+			defaultHierarchy: LocalDateTable_5478c982-b42f-444d-b17b-7948f1e6d9c1.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	/// EN: Administrative district (kabupaten) where the price was recorded. ID: Kabupaten tempat harga dicatat.
+	column district
+		dataType: string
+		lineageTag: da3a5a15-0468-46f8-ac04-2392bc9e060c
+		summarizeBy: none
+		sourceColumn: district
+
+		annotation SummarizationSetBy = Automatic
+
+	/// EN: Horticultural commodity name (e.g. chilli, shallot, garlic, tomato). ID: Nama komoditas hortikultura (mis. cabai, bawang merah, bawang putih, tomat).
+	column commodity
+		dataType: string
+		lineageTag: 4649ed2d-c32e-4eeb-a988-3fcef4da4a45
+		summarizeBy: none
+		sourceColumn: commodity
+
+		annotation SummarizationSetBy = Automatic
+
+	/// EN: Recorded daily market price in Indonesian Rupiah per kilogram (Rp/kg). ID: Harga pasar harian yang tercatat dalam Rupiah Indonesia per kilogram (Rp/kg).
+	column price_rp_kg
+		dataType: int64
+		formatString: Rp #,##0
+		lineageTag: 8e749c93-fc49-42e2-88c4-9bf20331cc54
+		summarizeBy: average
+		sourceColumn: price_rp_kg
+
+		annotation SummarizationSetBy = Automatic
+
+	column spike
+		dataType: int64
+		formatString: 0
+		lineageTag: f24581a2-9603-4cfa-984f-e7ed696336b5
+		summarizeBy: sum
+		sourceColumn: spike
+
+		annotation SummarizationSetBy = Automatic
+
+	partition prices_dashboard = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\asus\OneDrive - Lincoln University\Life\Research\Price Spike Project\south-sumatra-price-spike-early-warning\data\processed\dashboard_ready\prices_dashboard.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"date", type date}, {"district", type text}, {"commodity", type text}, {"price_rp_kg", Int64.Type}, {"spike", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

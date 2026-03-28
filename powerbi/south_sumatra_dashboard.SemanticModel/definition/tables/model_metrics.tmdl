@@ -1,0 +1,116 @@
+/// EN: Model evaluation results table containing classification performance metrics (AUC, F1, precision, recall, accuracy) across different model configurations and evaluation conditions. ID: Tabel hasil evaluasi model yang berisi metrik kinerja klasifikasi (AUC, F1, presisi, recall, akurasi) di berbagai konfigurasi model dan kondisi evaluasi.
+table model_metrics
+	lineageTag: 90181ce8-22ff-4d6d-ba3a-1ceb74255d19
+
+	/// EN: Maximum Area Under the ROC Curve (AUC) across all models and conditions in model_metrics. Values closer to 1.0 indicate better discriminative ability. ID: Nilai Area Under the ROC Curve (AUC) tertinggi dari semua model dan kondisi dalam model_metrics. Nilai mendekati 1,0 menunjukkan kemampuan diskriminasi yang lebih baik.
+	measure 'Best AUC' = MAX(model_metrics[auc])
+		formatString: 0.000
+		displayFolder: Model Performance
+		lineageTag: c6a4bf01-7cea-42e7-9250-0f2dc061357c
+
+	/// EN: Maximum F1 score across all models and conditions. F1 is the harmonic mean of precision and recall — the primary performance metric for imbalanced spike detection datasets. ID: Nilai F1 tertinggi dari semua model dan kondisi. F1 adalah rata-rata harmonik presisi dan recall — metrik kinerja utama untuk dataset deteksi spike yang tidak seimbang.
+	measure 'Best F1 Score' = MAX(model_metrics[f1])
+		formatString: 0.000
+		displayFolder: Model Performance
+		lineageTag: 4dd610af-ab4a-4a72-8b9f-da162de70305
+
+	/// EN: Average precision score across all models and evaluation conditions. Precision measures the proportion of predicted spikes that were actual spikes (low false-positive rate). ID: Rata-rata skor presisi di semua model dan kondisi evaluasi. Presisi mengukur proporsi prediksi spike yang benar-benar merupakan spike (tingkat false-positive rendah).
+	measure 'Average Precision' = AVERAGE(model_metrics[precision])
+		formatString: 0.000
+		displayFolder: Model Performance
+		lineageTag: 30178cae-e340-4a9a-ba21-8c2be124f536
+
+	/// EN: Average recall score across all models and evaluation conditions. Recall measures the proportion of actual spikes that were correctly detected (low false-negative rate). Critical for early warning systems. ID: Rata-rata skor recall di semua model dan kondisi evaluasi. Recall mengukur proporsi spike aktual yang berhasil terdeteksi (tingkat false-negative rendah). Kritis untuk sistem peringatan dini.
+	measure 'Average Recall' = AVERAGE(model_metrics[recall])
+		formatString: 0.000
+		displayFolder: Model Performance
+		lineageTag: 3d4533d9-d57e-4e84-8d0e-0ae03f8eba07
+
+	column model
+		dataType: string
+		lineageTag: c35be0f8-1bdd-46df-87c2-c6eed495c94d
+		summarizeBy: none
+		sourceColumn: model
+
+		annotation SummarizationSetBy = Automatic
+
+	column condition
+		dataType: string
+		lineageTag: 078e1bfc-4221-4e36-942f-437701c0c1a7
+		summarizeBy: none
+		sourceColumn: condition
+
+		annotation SummarizationSetBy = Automatic
+
+	/// EN: Area Under the ROC Curve. ID: Luas di bawah kurva ROC.
+	column auc
+		dataType: double
+		formatString: 0.000
+		lineageTag: c45d2c76-b463-42ab-a1ef-9a4e214c45ce
+		summarizeBy: max
+		sourceColumn: auc
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// EN: Classification precision — proportion of predicted spikes that were true spikes. ID: Presisi klasifikasi — proporsi prediksi spike yang merupakan spike sesungguhnya.
+	column precision
+		dataType: double
+		formatString: 0.000
+		lineageTag: acfde93d-34a4-471f-b3d8-78d3d57ce391
+		summarizeBy: average
+		sourceColumn: precision
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// EN: Classification recall — proportion of actual spikes correctly detected. ID: Recall klasifikasi — proporsi spike aktual yang berhasil terdeteksi.
+	column recall
+		dataType: double
+		formatString: 0.000
+		lineageTag: 8c733691-2c7d-4656-bb07-ff278856f41d
+		summarizeBy: average
+		sourceColumn: recall
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// EN: F1 score — harmonic mean of precision and recall. Primary metric for this imbalanced classification problem. ID: Skor F1 — rata-rata harmonik presisi dan recall. Metrik utama untuk masalah klasifikasi tidak seimbang ini.
+	column f1
+		dataType: double
+		formatString: 0.000
+		lineageTag: 50eebe41-13c4-4af3-8717-19452fc1cd94
+		summarizeBy: max
+		sourceColumn: f1
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// EN: Overall classification accuracy. Use with caution on imbalanced datasets. ID: Akurasi klasifikasi keseluruhan. Gunakan dengan hati-hati pada dataset yang tidak seimbang.
+	column accuracy
+		dataType: double
+		formatString: 0.000
+		lineageTag: d70fab82-fa64-47b2-9078-242fb9c3bad3
+		summarizeBy: average
+		sourceColumn: accuracy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition model_metrics = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\asus\OneDrive - Lincoln University\Life\Research\Price Spike Project\south-sumatra-price-spike-early-warning\data\processed\dashboard_ready\model_metrics.csv"),[Delimiter=",", Columns=7, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"model", type text}, {"condition", type text}, {"auc", type number}, {"precision", type number}, {"recall", type number}, {"f1", type number}, {"accuracy", type number}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

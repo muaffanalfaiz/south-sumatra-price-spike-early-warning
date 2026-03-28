@@ -1,40 +1,27 @@
+# Power BI binary files (large, regenerated on open)
+*.pbix
+*.pbit
+
+# Power BI local settings and cache (user-specific, not shareable)
+**/.pbi/localSettings.json
+**/.pbi/editorSettings.json
+**/.pbi/cache.abf
+
+# Power BI autorecover
+*.pbix.autorecovery
+
 # Python
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
-*.pyd
-.Python
-*.egg-info/
-dist/
-build/
-.eggs/
-*.egg
+.env
+venv/
+.venv/
 
 # Jupyter
 .ipynb_checkpoints/
-*.ipynb_checkpoints
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-
-# Data - raw files (too large for GitHub, use Git LFS or exclude)
-data/raw/*.csv
-data/raw/*.json
-data/raw/*.tif
-data/raw/*.geojson
-
-# Sensitive
-*.key
-*.pem
-credentials.json
-service_account.json
-ee_credentials.json
-
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -42,9 +29,14 @@ desktop.ini
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# Large outputs
-outputs/maps/*.html
-# Keep PNGs and CSVs, exclude large HTML maps from tracking if needed
+# Data files (too large for git - document download sources in README)
+*.csv
+*.xlsx
+*.parquet
+data/raw/
+data/processed/
+
+# Build outputs
+south_sumatra_dashboard_WITH_LAYOUT.pbix
+south_sumatra_dashboard_backup_*.pbix

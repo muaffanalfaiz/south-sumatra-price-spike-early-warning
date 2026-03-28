@@ -1,0 +1,55 @@
+/// EN: Model explainability table listing predictor variables ranked by their contribution to spike prediction. Used to communicate model drivers to non-technical stakeholders. ID: Tabel eksplainabilitas model yang mencantumkan variabel prediktor yang diurutkan berdasarkan kontribusinya terhadap prediksi spike. Digunakan untuk mengkomunikasikan pendorong model kepada pemangku kepentingan non-teknis.
+table feature_importance
+	lineageTag: bc8362a2-f954-45bd-8e0b-2d994f8110d5
+
+	/// EN: Name of the predictor variable with the highest importance score in the feature_importance table. Identifies the single most influential driver of price spike predictions. ID: Nama variabel prediktor dengan skor kepentingan tertinggi dalam tabel feature_importance. Mengidentifikasi faktor tunggal paling berpengaruh dalam prediksi lonjakan harga.
+	measure 'Top Feature' =
+			VAR _topScore = MAX(feature_importance[importance])
+			RETURN
+			    CALCULATE(
+			        MAX(feature_importance[feature]),
+			        feature_importance[importance] = _topScore
+			    )
+		displayFolder: Model Performance
+		lineageTag: cc569f87-ad97-487f-8c62-c86710b1fc78
+
+	column feature
+		dataType: string
+		lineageTag: fb1a78de-46f3-49dc-9084-629314057b94
+		summarizeBy: none
+		sourceColumn: feature
+
+		annotation SummarizationSetBy = Automatic
+
+	/// EN: Relative importance score assigned to this feature by the trained model. Higher values indicate stronger predictive contribution. ID: Skor kepentingan relatif yang diberikan pada fitur ini oleh model terlatih. Nilai lebih tinggi menunjukkan kontribusi prediktif yang lebih kuat.
+	column importance
+		dataType: double
+		formatString: 0.0000
+		lineageTag: 969da7b7-8555-4314-b927-9854e0d1b481
+		summarizeBy: none
+		sourceColumn: importance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column category
+		dataType: string
+		lineageTag: 9e412e2e-428d-4129-ab16-4fb9034e0f4c
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	partition feature_importance = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\asus\OneDrive - Lincoln University\Life\Research\Price Spike Project\south-sumatra-price-spike-early-warning\data\processed\dashboard_ready\feature_importance.csv"),[Delimiter=",", Columns=3, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"feature", type text}, {"importance", type number}, {"category", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+
